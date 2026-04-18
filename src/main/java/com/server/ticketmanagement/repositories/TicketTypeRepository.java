@@ -1,4 +1,4 @@
-package com.server.ticketmanagement.services;
+package com.server.ticketmanagement.repositories;
 
 import com.server.ticketmanagement.domain.entities.TicketType;
 import jakarta.persistence.LockModeType;
