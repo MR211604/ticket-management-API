@@ -1,10 +1,9 @@
 package com.server.ticketmanagement.config;
-
+import com.server.ticketmanagement.config.JwtAuthenticationConverter;
 import com.server.ticketmanagement.filters.UserProvisioningFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
@@ -25,6 +24,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/published-events/**")
                         .permitAll()
                         .requestMatchers("/api/v1/events").hasRole("ORGANIZER")
+                        .requestMatchers("/api/v1/ticket-validations").hasRole("STAFF")
                         .anyRequest().authenticated())
                 .csrf(csrf ->
                         csrf.disable())
