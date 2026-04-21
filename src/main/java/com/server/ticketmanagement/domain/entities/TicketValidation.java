@@ -26,7 +26,7 @@ public class TicketValidation {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private TicketStatusEnum status;
+    private TicketValidationStatusEnum status;
 
     @Column(name = "validation_method", nullable = false)
     @Enumerated(EnumType.STRING)
