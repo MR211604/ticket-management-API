@@ -23,7 +23,7 @@ public class ListEventResponseDto {
     private LocalDateTime salesStart;
     private LocalDateTime salesEnd;
     private EventStatusEnum status;
+    private byte[] image;
     private List<ListEventTicketTypeResponseDto> ticketTypes = new ArrayList<>();
-
 
 }

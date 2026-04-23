@@ -23,7 +23,6 @@ public class UpdateEventRequest {
     private LocalDateTime salesStart;
     private LocalDateTime salesEnd;
     private EventStatusEnum status;
-
+    private byte[] image;
     private List<UpdateTicketTypeRequest> ticketTypes = new ArrayList<>();
-
 }

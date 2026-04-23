@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface TicketValidationService {
 
-    TicketValidation validateTicketByQrCode(UUID qrCodeId);
-    TicketValidation validateTicketManually(UUID ticketId);
+    TicketValidation validateTicketByQrCode(UUID qrCodeId, UUID staffId);
+    TicketValidation validateTicketManually(UUID ticketId, UUID staffId);
 
 }

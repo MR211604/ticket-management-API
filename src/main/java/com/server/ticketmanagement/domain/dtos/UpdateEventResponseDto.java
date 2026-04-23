@@ -23,6 +23,7 @@ public class UpdateEventResponseDto {
     private LocalDateTime salesStart;
     private LocalDateTime salesEnd;
     private EventStatusEnum status;
+    private byte[] image;
     private List<UpdateTicketTypeResponseDto> ticketTypes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

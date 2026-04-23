@@ -35,6 +35,8 @@ public class UpdateEventRequestDto {
     @NotNull(message = "Event status must be provided")
     private EventStatusEnum status;
 
+    private byte[] image;
+
     @NotEmpty(message = "At least 1 ticket type is required")
     @Valid
     private List<UpdateTicketTypeRequestDto> ticketTypes;

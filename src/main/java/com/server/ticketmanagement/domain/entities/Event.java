@@ -46,6 +46,10 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatusEnum status;
 
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
+
     // Relationships
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,4 +87,3 @@ public class Event {
         return Objects.hash(id, name, start, end, venue, salesStart, salesEnd, status, createdAt, updatedAt);
     }
 }
-

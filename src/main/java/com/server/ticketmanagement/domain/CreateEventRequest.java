@@ -22,7 +22,7 @@ public class CreateEventRequest {
     private LocalDateTime salesStart;
     private LocalDateTime salesEnd;
     private EventStatusEnum status;
-
+    private byte[] image;
     private List<CreateTicketTypeRequest> ticketTypes = new ArrayList<>();
 
 }

@@ -17,4 +17,5 @@ public class ListPublishedEventResponseDto {
     private LocalDateTime start;
     private LocalDateTime end;
     private String venue;
+    private byte[] image;
 }
