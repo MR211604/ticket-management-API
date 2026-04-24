@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class PublishedEventsController {
     private final EventMapper eventMapper;
 
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<Page<ListPublishedEventResponseDto>> listPublishedEvents(
             Pageable pageable,
             @RequestParam(required = false) String q
@@ -40,6 +42,7 @@ public class PublishedEventsController {
     }
 
     @GetMapping(path = "/{eventId}")
+    @Transactional(readOnly = true)
     public ResponseEntity<GetPublishedEventDetailsResponseDto> getPublishedEventDetails(
             @PathVariable UUID eventId
     ) {

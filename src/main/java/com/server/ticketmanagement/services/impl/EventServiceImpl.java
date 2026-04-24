@@ -60,6 +60,7 @@ public class EventServiceImpl implements EventService {
         eventToCreate.setSalesStart(event.getSalesStart());
         eventToCreate.setSalesEnd(event.getSalesEnd());
         eventToCreate.setStatus(event.getStatus());
+        eventToCreate.setImage(event.getImage());
         eventToCreate.setOrganizer(organizer);
         eventToCreate.setTicketTypes(ticketTypesToCreate);
 
@@ -98,6 +99,7 @@ public class EventServiceImpl implements EventService {
         existingEvent.setSalesStart(event.getSalesStart());
         existingEvent.setSalesEnd(event.getSalesEnd());
         existingEvent.setStatus(event.getStatus());
+        existingEvent.setImage(event.getImage());
 
         Set<UUID> requestTicketTypeIds = event.getTicketTypes().stream().map(UpdateTicketTypeRequest::getId)
                 .filter(Objects::nonNull)

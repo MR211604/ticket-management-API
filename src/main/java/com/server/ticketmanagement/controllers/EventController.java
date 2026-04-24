@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -57,6 +58,7 @@ public class EventController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<Page<ListEventResponseDto>> listEvents(
             @AuthenticationPrincipal Jwt jwt,
             Pageable pageable
@@ -67,6 +69,7 @@ public class EventController {
     }
 
     @GetMapping(path = "/{eventId}")
+    @Transactional(readOnly = true)
     public ResponseEntity<GetEventDetailsResponseDto> getEvent(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID eventId
