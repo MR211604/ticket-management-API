@@ -1,6 +1,7 @@
 package com.server.ticketmanagement.services.impl;
 
 import com.server.ticketmanagement.domain.entities.*;
+import com.server.ticketmanagement.exceptions.EventNotFoundException;
 import com.server.ticketmanagement.exceptions.QrCodeNotFoundException;
 import com.server.ticketmanagement.exceptions.TicketNotFoundException;
 import com.server.ticketmanagement.exceptions.UserNotFoundException;
@@ -31,6 +32,12 @@ public class TicketValidationServiceImpl implements TicketValidationService {
         User purchaser = ticket.getPurchaser();
         Event event = ticket.getTicketType().getEvent();
 
+        if (event.getStatus().equals(EventStatusEnum.CANCELLED) || event.getStatus().equals(EventStatusEnum.COMPLETED)) {
+            throw new EventNotFoundException(
+                    "Event has already finished"
+            );
+        }
+
         TicketValidationStatusEnum ticketValidationStatus = ticket.getValidations().stream()
                 .filter(v -> TicketValidationStatusEnum.VALID.equals(v.getStatus()))
                 .findFirst()
@@ -54,6 +61,7 @@ public class TicketValidationServiceImpl implements TicketValidationService {
         }
 
         TicketValidation ticketValidation = new TicketValidation();
+        ticket.setStatus(TicketStatusEnum.CANCELLED);
         ticketValidation.setTicket(ticket);
         ticketValidation.setValidationMethod(ticketValidationMethod);
         ticketValidation.setStatus(ticketValidationStatus);
@@ -68,7 +76,6 @@ public class TicketValidationServiceImpl implements TicketValidationService {
                         String.format("QR code with ID %s was not found", qrCodeId)
                 ));
         Ticket ticket = qrCode.getTicket();
-
         return validateTicket(ticket, TicketValidationMethod.QR_SCAN, staffId);
 
     }

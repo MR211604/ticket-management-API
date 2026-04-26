@@ -22,5 +22,7 @@ public interface TicketMapper {
     @Mapping(target = "eventVenue", source = "ticket.ticketType.event.venue")
     @Mapping(target = "eventStart", source = "ticket.ticketType.event.start")
     @Mapping(target = "eventEnd", source = "ticket.ticketType.event.end")
+    @Mapping(target = "eventStatus", source = "ticket.ticketType.event.status")
+    @Mapping(target = "image", source = "ticket.ticketType.event.image")
     GetTicketResponseDto toGetTicketResponseDto(Ticket ticket);
 }

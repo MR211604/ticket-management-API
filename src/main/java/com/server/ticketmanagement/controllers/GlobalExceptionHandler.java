@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -136,6 +137,16 @@ public class GlobalExceptionHandler {
                 violation.getPropertyPath() + ": " + violation.getMessage())
                         .orElse("Constraint violation occurred");
         errorDto.setError(errorMessage);
+        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorDto> handleMissingServletRequestParameterException(
+            MissingServletRequestParameterException ex
+    ) {
+        log.error("Caught MissingServletRequestParameterException", ex);
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setError("Required query parameter '" + ex.getParameterName() + "' is not present.");
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
 

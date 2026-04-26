@@ -1,5 +1,6 @@
 package com.server.ticketmanagement.domain.dtos;
 
+import com.server.ticketmanagement.domain.entities.EventStatusEnum;
 import com.server.ticketmanagement.domain.entities.TicketStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,5 +22,8 @@ public class GetTicketResponseDto {
     private String eventVenue;
     private LocalDateTime eventStart;
     private LocalDateTime eventEnd;
+    private EventStatusEnum eventStatus;
+    private byte[] image;
+
 
 }

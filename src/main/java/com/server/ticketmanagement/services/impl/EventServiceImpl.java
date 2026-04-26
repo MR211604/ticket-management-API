@@ -16,6 +16,7 @@ import com.server.ticketmanagement.repositories.UserRepository;
 import com.server.ticketmanagement.services.EventService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -91,55 +92,61 @@ public class EventServiceImpl implements EventService {
         Event existingEvent = eventRepository.findByIdAndOrganizerId(id, organizerId).orElseThrow(() ->
                 new EventNotFoundException(String.format("Event with ID '%s' does not exist", id)));
 
-        // Start updating existing event
-        existingEvent.setName(event.getName());
-        existingEvent.setStart(event.getStart());
-        existingEvent.setEnd(event.getEnd());
-        existingEvent.setVenue(event.getVenue());
-        existingEvent.setSalesStart(event.getSalesStart());
-        existingEvent.setSalesEnd(event.getSalesEnd());
-        existingEvent.setStatus(event.getStatus());
-        existingEvent.setImage(event.getImage());
+        if (event.getName() != null) existingEvent.setName(event.getName());
+        if (event.getStart() != null) existingEvent.setStart(event.getStart());
+        if (event.getEnd() != null) existingEvent.setEnd(event.getEnd());
+        if (event.getVenue() != null) existingEvent.setVenue(event.getVenue());
+        if (event.getSalesStart() != null) existingEvent.setSalesStart(event.getSalesStart());
+        if (event.getSalesEnd() != null) existingEvent.setSalesEnd(event.getSalesEnd());
+        if (event.getStatus() != null) existingEvent.setStatus(event.getStatus());
+        if (event.getImage() != null) existingEvent.setImage(event.getImage());
 
-        Set<UUID> requestTicketTypeIds = event.getTicketTypes().stream().map(UpdateTicketTypeRequest::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        if (event.getTicketTypes() != null && !event.getTicketTypes().isEmpty()) {
+            Set<UUID> requestTicketTypeIds = event.getTicketTypes().stream().map(UpdateTicketTypeRequest::getId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
 
-        existingEvent.getTicketTypes().removeIf(existingTicketType
-                -> !requestTicketTypeIds.contains(existingTicketType.getId()));
+            existingEvent.getTicketTypes().removeIf(existingTicketType
+                    -> !requestTicketTypeIds.contains(existingTicketType.getId()));
 
-        Map<UUID, TicketType> existingTicketTypesIndex = existingEvent.getTicketTypes().stream()
-                .collect(Collectors.toMap(TicketType::getId, Function.identity()));
+            Map<UUID, TicketType> existingTicketTypesIndex = existingEvent.getTicketTypes().stream()
+                    .collect(Collectors.toMap(TicketType::getId, Function.identity()));
 
-        for (UpdateTicketTypeRequest ticketType : event.getTicketTypes()) {
-            if (null == ticketType.getId()) {
+            for (UpdateTicketTypeRequest ticketType : event.getTicketTypes()) {
+                if (null == ticketType.getId()) {
 
-                TicketType ticketTypeToCreate = new TicketType();
-                ticketTypeToCreate.setName(ticketType.getName());
-                ticketTypeToCreate.setPrice(ticketType.getPrice());
-                ticketTypeToCreate.setDescription(ticketType.getDescription());
-                ticketTypeToCreate.setTotalAvailable(ticketType.getTotalAvailable());
-                ticketTypeToCreate.setEvent(existingEvent);
-                existingEvent.getTicketTypes().add(ticketTypeToCreate);
+                    TicketType ticketTypeToCreate = getTicketType(ticketType, existingEvent);
+                    existingEvent.getTicketTypes().add(ticketTypeToCreate);
 
-            } else if (existingTicketTypesIndex.containsKey(ticketType.getId())) {
+                } else if (existingTicketTypesIndex.containsKey(ticketType.getId())) {
 
-                TicketType existingTicketType = existingTicketTypesIndex.get(ticketType.getId());
-                existingTicketType.setName(ticketType.getName());
-                existingTicketType.setPrice(ticketType.getPrice());
-                existingTicketType.setDescription(ticketType.getDescription());
-                existingTicketType.setTotalAvailable(ticketType.getTotalAvailable());
+                    TicketType existingTicketType = existingTicketTypesIndex.get(ticketType.getId());
+                    if (ticketType.getName() != null) existingTicketType.setName(ticketType.getName());
+                    if (ticketType.getPrice() != null) existingTicketType.setPrice(ticketType.getPrice());
+                    if (ticketType.getDescription() != null) existingTicketType.setDescription(ticketType.getDescription());
+                    if (ticketType.getTotalAvailable() != null) existingTicketType.setTotalAvailable(ticketType.getTotalAvailable());
 
-            } else {
-                throw new TicketTypeNotFoundException(String.format(
-                        "Ticket type with ID '%s' does not exist",
-                        ticketType.getId()
-                ));
+                } else {
+                    throw new TicketTypeNotFoundException(String.format(
+                            "Ticket type with ID '%s' does not exist",
+                            ticketType.getId()
+                    ));
+                }
             }
         }
 
         return eventRepository.save(existingEvent);
 
+    }
+
+    private static @NonNull TicketType getTicketType(UpdateTicketTypeRequest ticketType, Event existingEvent) {
+        TicketType ticketTypeToCreate = new TicketType();
+        if (ticketType.getName() != null) ticketTypeToCreate.setName(ticketType.getName());
+        if (ticketType.getPrice() != null) ticketTypeToCreate.setPrice(ticketType.getPrice());
+        if (ticketType.getDescription() != null) ticketTypeToCreate.setDescription(ticketType.getDescription());
+        if (ticketType.getTotalAvailable() != null) ticketTypeToCreate.setTotalAvailable(ticketType.getTotalAvailable());
+        ticketTypeToCreate.setEvent(existingEvent);
+        return ticketTypeToCreate;
     }
 
     @Override

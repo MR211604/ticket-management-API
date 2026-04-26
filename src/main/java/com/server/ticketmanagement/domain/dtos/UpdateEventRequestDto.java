@@ -20,24 +20,20 @@ public class UpdateEventRequestDto {
     @NotNull(message = "Event id must be provided")
     private UUID id;
 
-    @NotBlank(message = "Name is required")
     private String name;
 
     private LocalDateTime start;
     private LocalDateTime end;
 
-    @NotBlank(message = "Venue information is required")
     private String venue;
 
     private LocalDateTime salesStart;
     private LocalDateTime salesEnd;
 
-    @NotNull(message = "Event status must be provided")
     private EventStatusEnum status;
 
     private byte[] image;
 
-    @NotEmpty(message = "At least 1 ticket type is required")
     @Valid
     private List<UpdateTicketTypeRequestDto> ticketTypes;
 }

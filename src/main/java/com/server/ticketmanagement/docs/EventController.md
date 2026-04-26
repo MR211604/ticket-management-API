@@ -32,6 +32,7 @@ Este controlador maneja las operaciones CRUD para la gestión de Eventos (`Event
   "salesStart": "2026-05-01T10:00:00",
   "salesEnd": "2026-10-15T18:00:00",
   "status": "PUBLISHED",
+  "image": "base64EncodedImageString",
   "ticketTypes": [
     {
       "name": "General",
