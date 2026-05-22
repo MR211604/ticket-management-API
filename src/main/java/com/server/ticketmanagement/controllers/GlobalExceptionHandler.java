@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +20,11 @@ import java.util.List;
 @Slf4j
 public class GlobalExceptionHandler {
 
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleInvalidEnum(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body("Invalid user role.");
+    }
 
     @ExceptionHandler(TicketNotFoundException.class)
     public ResponseEntity<ErrorDto> handleTicketNotFoundException(
@@ -110,6 +116,16 @@ public class GlobalExceptionHandler {
         log.error("Caught UserAlreadyExistsException", ex);
         ErrorDto errorDto = new ErrorDto();
         errorDto.setError(ex.getMessage());
+        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RoleNotFound.class)
+    public ResponseEntity<ErrorDto> handleRoleNotFound(
+            RoleNotFound ex
+    ) {
+        log.error("Caught RoleNotFound", ex);
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setError("User role not found");
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
 

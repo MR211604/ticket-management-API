@@ -7,6 +7,7 @@ import com.server.ticketmanagement.exceptions.UserAlreadyExistsException;
 import com.server.ticketmanagement.repositories.UserRepository;
 import com.server.ticketmanagement.services.ProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class ProfileServiceImpl implements ProfileService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public ProfileResponseDto createProfile(ProfileRequestDto profileRequest) {
@@ -32,6 +34,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .userId(newProfile.getId())
                 .email(newProfile.getEmail())
                 .name(newProfile.getName())
+                .userRol(newProfile.getUserRole())
                 .isAccountVerified(newProfile.getIsAccountVerified())
                 .build();
     }
@@ -40,7 +43,8 @@ public class ProfileServiceImpl implements ProfileService {
         return User.builder()
                 .email(profileRequest.getEmail())
                 .name(profileRequest.getName())
-                .password(profileRequest.getPassword())
+                .password(passwordEncoder.encode(profileRequest.getPassword()))
+                .userRole(profileRequest.getUserRol())
                 .isAccountVerified(false)
                 .resetOTPExpiredAt(0L)
                 .verifyOTP(null)

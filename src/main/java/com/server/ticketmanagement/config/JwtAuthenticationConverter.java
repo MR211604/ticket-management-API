@@ -23,13 +23,12 @@ public class JwtAuthenticationConverter implements Converter<Jwt, JwtAuthenticat
     }
 
     private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
-        Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-        if (null == realmAccess || !realmAccess.containsKey("roles")) {
+        if (!jwt.hasClaim("roles")) {
             return Collections.emptyList();
         }
 
         @SuppressWarnings("unchecked")
-        List<String> roles = (List<String>)realmAccess.get("roles");
+        List<String> roles = (List<String>) jwt.getClaim("roles");
 
         return roles.stream()
                 .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)

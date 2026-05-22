@@ -48,6 +48,10 @@ public class User {
     @Column(name = "reset_top_expired_at")
     private Long resetOTPExpiredAt;
 
+    @Column(name = "user_role")
+    @Enumerated(EnumType.STRING)
+    private UserRoleEnum userRole;
+
     //Organizer events
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
     private List<Event> organizedEvents = new ArrayList<>();
