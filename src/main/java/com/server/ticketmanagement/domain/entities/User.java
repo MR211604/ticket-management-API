@@ -16,17 +16,37 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 public class User {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "verify_otp")
+    private String verifyOTP;
+
+    @Column(name = "is_account_verified")
+    private Boolean isAccountVerified;
+
+    @Column(name = "verify_otp_expired_at")
+    private Long verifyOTPExpiredAt;
+
+    @Column(name = "reset_otp")
+    private String resetOTP;
+
+    @Column(name = "reset_top_expired_at")
+    private Long resetOTPExpiredAt;
 
     //Organizer events
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)

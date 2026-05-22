@@ -103,6 +103,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorDto> handleUserAlreadyExistsException(
+            UserAlreadyExistsException ex
+    ) {
+        log.error("Caught UserAlreadyExistsException", ex);
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setError(ex.getMessage());
+        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException ex
