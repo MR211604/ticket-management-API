@@ -1,5 +1,5 @@
 package com.server.ticketmanagement.config;
-import com.server.ticketmanagement.filters.UserProvisioningFilter;
+import com.server.ticketmanagement.filters.JwtRequestFilter;
 import com.server.ticketmanagement.services.impl.UserDetailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,29 +30,27 @@ import java.util.List;
 public class SecurityConfig {
 
     private final UserDetailServiceImpl userDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
+    private final CustomAuthenticationEntrypoint customAuthenticationEntrypoint;
 
     @Bean
     public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            UserProvisioningFilter userProvisioningFilter,
-            JwtAuthenticationConverter jwtAuthenticationConverter
+            HttpSecurity http
     ) throws Exception {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/published-events/**").permitAll()
                         .requestMatchers("/api/v1/events").hasRole("ORGANIZER")
                         .requestMatchers("/api/v1/statistics/**").hasRole("ORGANIZER")
                         .requestMatchers("/api/v1/ticket-validations").hasRole("STAFF")
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
-                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(AbstractHttpConfigurer::disable)
-                .addFilterAfter(userProvisioningFilter, BearerTokenAuthenticationFilter.class);
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntrypoint));
         return http.build();
     }
 

@@ -29,6 +29,13 @@ public class ProfileServiceImpl implements ProfileService {
         return convertToProfileEntity(newProfile);
     }
 
+    @Override
+    public ProfileResponseDto getProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+        return convertToProfileEntity(user);
+    }
+
     private ProfileResponseDto convertToProfileEntity(User newProfile) {
         return ProfileResponseDto.builder()
                 .userId(newProfile.getId())
