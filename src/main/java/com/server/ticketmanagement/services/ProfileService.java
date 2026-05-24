@@ -9,4 +9,7 @@ public interface ProfileService {
 
     ProfileResponseDto getProfile(String email);
 
+    void sendResetOTP(String email);
+
 }
+

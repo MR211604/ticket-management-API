@@ -1,6 +1,7 @@
 package com.server.ticketmanagement.controllers;
 import com.server.ticketmanagement.domain.dtos.AuthRequestDto;
 import com.server.ticketmanagement.domain.dtos.AuthResponseDto;
+import com.server.ticketmanagement.services.ProfileService;
 import com.server.ticketmanagement.services.impl.UserDetailServiceImpl;
 import com.server.ticketmanagement.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +15,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,6 +32,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
+    private final ProfileService profileService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto request) {
@@ -59,8 +60,24 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/is-authenticated")
+    public ResponseEntity<Boolean> isAuthenticated(@CurrentSecurityContext(expression = "authentication?.name") String email) {
+        return ResponseEntity.ok(email != null);
+    }
+
+    @PostMapping("/send-reset-otp")
+    public void sendResetOTP(@RequestParam String email) {
+        try{
+            profileService.sendResetOTP(email);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
     private void authenticate(String email, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
     }
+
+
 
 }

@@ -37,4 +37,22 @@ public class EmailServiceImpl {
         }
     }
 
+    public void sendResetOTPEmail(String to, String name, String otp) {
+        try {
+            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            simpleMailMessage.setFrom(fromEmail);
+            simpleMailMessage.setTo(to);
+            simpleMailMessage.setSubject("Password reset OTP");
+            simpleMailMessage.setText("Dear " + name + ",\n\nYour OTP reset is.\n\n" + otp + "\n\nUse this OTP to proceed with resetting your password." + "\n\nBest regards,\nSmartPass");
+            mailSender.send(simpleMailMessage);
+            log.info("Reset OTP email successfully sent to {}", to);
+        } catch (MailException e) {
+            log.error("Failed to send email to {}. Error: {}", to, e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while sending email to {}: {}", to, e.getMessage(), e);
+            throw e;
+        }
+    }
+
 }
