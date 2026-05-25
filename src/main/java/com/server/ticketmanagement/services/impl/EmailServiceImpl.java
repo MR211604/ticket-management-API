@@ -55,4 +55,22 @@ public class EmailServiceImpl {
         }
     }
 
+    public void sendOTPEmail(String to, String name, String otp) {
+        try {
+            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            simpleMailMessage.setFrom(fromEmail);
+            simpleMailMessage.setTo(to);
+            simpleMailMessage.setSubject("Verify your account");
+            simpleMailMessage.setText("Dear " + name + ",\n\nYour OTP code is.\n\n" + otp + "\n\nUse this OTP to proceed with verifying your account." + "\n\nBest regards,\nSmartPass");
+            mailSender.send(simpleMailMessage);
+            log.info("OTP email successfully sent to {}", to);
+        } catch (MailException e) {
+            log.error("Failed to send email to {}. Error: {}", to, e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while sending email to {}: {}", to, e.getMessage(), e);
+            throw e;
+        }
+    }
+
 }

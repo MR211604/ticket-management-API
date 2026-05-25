@@ -10,7 +10,7 @@ import com.server.ticketmanagement.services.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -60,6 +60,68 @@ public class ProfileServiceImpl implements ProfileService {
 
     }
 
+    @Override
+    public void resetPassword(String email, String otp, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+        if (user.getResetOTP() == null || !user.getResetOTP().equals(otp) || System.currentTimeMillis() > user.getResetOTPExpiredAt()) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetOTP(null);
+        user.setResetOTPExpiredAt(0L);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void sendOTP(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+        if(user.getIsAccountVerified() != null && user.getIsAccountVerified()) {
+            return;
+        }
+
+        String otp = generateOTP();
+
+        long expirationTime = System.currentTimeMillis() + 24 * 60 * 60 * 1000; // OTP valid for 24 hours
+
+        //Update user entity
+        user.setVerifyOTP(otp);
+        user.setVerifyOTPExpiredAt(expirationTime);
+        userRepository.save(user);
+
+        try {
+            emailService.sendOTPEmail(user.getEmail(), user.getName(), otp);
+        } catch(Exception ex) {
+            throw new RuntimeException("Failed to send OTP email: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void verifyOTP(String email, String otp) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+        if (user.getVerifyOTP() == null || !user.getVerifyOTP().equals(otp) || System.currentTimeMillis() > user.getVerifyOTPExpiredAt()) {
+            throw new IllegalArgumentException("Invalid or expired OTP");
+        }
+
+        user.setIsAccountVerified(true);
+        user.setVerifyOTP(null);
+        user.setVerifyOTPExpiredAt(0L);
+        userRepository.save(user);
+    }
+
+    @Override
+    public UUID getLoggedIdUserId(String email) {
+         User existingUser = userRepository.findByEmail(email)
+                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+         return existingUser.getId();
+    }
+
     private String generateOTP() {
         return String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
     }
@@ -69,7 +131,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .userId(newProfile.getId())
                 .email(newProfile.getEmail())
                 .name(newProfile.getName())
-                .userRol(newProfile.getUserRole())
+                .userRole(newProfile.getUserRole())
                 .isAccountVerified(newProfile.getIsAccountVerified())
                 .build();
     }

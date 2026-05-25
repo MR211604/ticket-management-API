@@ -17,6 +17,6 @@ public class ProfileResponseDto {
    private UUID userId;
    private String name;
    private String email;
-   private UserRoleEnum userRol;
+   private UserRoleEnum userRole;
    private Boolean isAccountVerified;
 }
